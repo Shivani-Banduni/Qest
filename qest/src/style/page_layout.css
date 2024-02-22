@@ -1,0 +1,23 @@
+.main-div{
+    border: 1px solid black;
+    height: 600px;
+    width: 966px;
+    top: -291px;
+    left: -550px;
+    border-radius: 20px;
+    position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.nav{
+    display: flex;
+    justify-content: space-between;
+    background-color: rgb(244,244,244);
+}
+.btn{
+    border-radius: 5wh;
+    height: 5vh;
+    margin-left: auto;
+
+}
