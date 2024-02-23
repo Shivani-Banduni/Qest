@@ -1,23 +1,34 @@
-.main-div{
-    border: 1px solid black;
+.main-div {
+    border: 1px solid white;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     height: 600px;
     width: 966px;
     top: -291px;
     left: -550px;
     border-radius: 20px;
     position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
-.nav{
+
+.nav {
     display: flex;
     justify-content: space-between;
-    background-color: rgb(244,244,244);
+    background-color: rgb(244, 244, 244);
+    padding: 2vh 2vh;
+    border-radius: 2vh;
 }
-.btn{
-    border-radius: 5wh;
-    height: 5vh;
+
+.btn {
+    border-radius: 100vh;
+    height: 5.6vh;
     margin-left: auto;
 
+}
+
+.input-box {
+    height: 5vh;
+    width: 19%;
+    border-radius: 10vh;
 }

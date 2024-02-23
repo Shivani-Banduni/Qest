@@ -11,156 +11,214 @@ import StatusIcon from '@mui/icons-material/CheckCircle';
 import LocationOnIcon from '@mui/icons-material/LocationOn'; // Importing location icon
 import Box from '@mui/material/Box'; // Used for layout
 import Showdata from './Showdata';
-import {data} from '../Data.js'
+import { data } from '../Data.js';
+import * as XLSX from 'xlsx';
+
 
 export default function Page_Layout() {
-    const[search,setSearch]=React.useState('')
-  const [statusValue, setStatusValue] = React.useState('');
-  const [locationValue, setLocationValue] = React.useState('');
-  const [filteredData, setFilteredData] = React.useState(); // Using state to store filtered data
+    const [search, setSearch] = React.useState('')
+    const [statusValue, setStatusValue] = React.useState('');
+    const [locationValue, setLocationValue] = React.useState('');
+    const [filteredData, setFilteredData] = React.useState();
 
 
 
-  let newData;
-  function handleSearch(e) {
-    const searchvalue = e.target.value.toLowerCase(); // Convert search term to lowercase for case-insensitive matching
-    setSearch(searchvalue); // Update search state
+    let newData;
+    function handleSearch(e) {
+        const searchvalue = e.target.value.toLowerCase();
+        setSearch(searchvalue);
+        const newData = data.filter((item) => {
+            return Object.values(item).some(value =>
+                String(value).toLowerCase().includes(searchvalue)
+            );
+        });
 
-    // Perform filtering
-    const newData = data.filter((item) => {
-        // Convert item values to lowercase and check if any value includes the search term
-        // Assuming all values are strings. Adjust the logic if some values are not strings.
-        return Object.values(item).some(value => 
-            String(value).toLowerCase().includes(searchvalue)
-        );
-    });
-
-    setFilteredData(newData); // Update state with filtered data
-}
+        setFilteredData(newData);
+    }
 
 
-// const handleSearchKeyDown=(e)=>{
-//     if(e.key==='Enter'){
-//         setFilteredData(newData)
-// console.log(filteredData)
-//     }
-// }
+    const handleStatusChange = (event) => {
+        const newValue = event.target.value;
+        setStatusValue(newValue);
+
+        const newData = data.filter((item) => {
+            return item.Status === newValue;
+        });
+        console.log(newData)
+        setFilteredData(newData);
+    };
+
+
+    const handleLocationChange = (event) => {
+        setLocationValue(event.target.value);
+        const newData = data.filter((e) => { return e.Distribution === event.target.value })
+        console.log(newData)
+        setFilteredData(newData)
+    };
 
 
 
-  const handleStatusChange = (event) => {
-    const newValue = event.target.value;
-    setStatusValue(newValue);
-
-    // Filter data based on the new value
-    const newData = data.filter((item) => {
-      return item.Status === newValue;
-    });
-    console.log(newData)
-    setFilteredData(newData); // Update state with filtered data
-  };
 
 
-  const handleLocationChange = (event) => {
-    setLocationValue(event.target.value);
-    const newData=data.filter((e)=>{return e.Distribution===event.target.value})
-    console.log(newData)
-    setFilteredData(newData)
-  };
+    const exportToExcel = () => {
+        const exportData = filteredData || data;
 
-  
-  return (
-    <div className='main-div'>
-      <Box className='nav'
-        sx={{
-          display: 'flex',
-          gap: 2, // Adjusts the space between the text fields
-        }}
-      >
-        <TextField  
-        onKeyDown={handleSearch}
-        onChange={handleSearch}
-                  sx={{bgcolor:'white', height:'40px'}}
-          variant="outlined"
-          placeholder="Search..."
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(exportData);
 
-        <FormControl variant="outlined"  >
-          <TextField
-
-                    sx={{bgcolor:'white',height:'40'}}
-            variant="outlined"
-            select
-            value={statusValue}
-            placeholder="Status"
-
-            onChange={handleStatusChange}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <StatusIcon color="success" />
-                </InputAdornment>
-              ),
-            }}
-          >
-
-         
-            <MenuItem  value="In Transit">In Transit</MenuItem>
-            <MenuItem value="Out for Delivery">Out for Delivery	</MenuItem>
-            <MenuItem value="Placed">Placed</MenuItem>
-            <MenuItem value="Delivered">Delivered</MenuItem>
-
-          </TextField>
-        </FormControl>
-
-        <FormControl variant="outlined" >
-          <TextField
-          sx={{bgcolor:'white'}}
-            variant="outlined"
-            select
-            value={locationValue}
-            onChange={handleLocationChange}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LocationOnIcon />
-                </InputAdornment>
-              ),
-            }}
-          >
-            <MenuItem value="Bangalore">Bangalore</MenuItem>
-            <MenuItem value="Patna">Patna</MenuItem>
-            <MenuItem value="Hyderabad">Hyderabad</MenuItem>
-          </TextField>
-        </FormControl>
+        XLSX.utils.book_append_sheet(wb, ws, "Orders");
+        XLSX.writeFile(wb, "Orders.xlsx");
+    };
 
 
-        <Button
-        className='btn'
-      variant="contained"
-      startIcon={<DownloadIcon />}
-      sx={{
-        backgroundColor: 'blue', // Set the background color to blue
-        color: 'white', // Set the text color to white
-        '&:hover': {
-          backgroundColor: 'darkblue', // Optional: change background on hover
-        },
-      }}
-    >
-      Download
-    </Button>
+    return (
+        <div className='main-div'>
+            <Box className='nav'
+                sx={{
+                    display: 'flex',
+                    gap: 2,
+                }}
+            >
+                <TextField
+                    onChange={handleSearch}
+                    sx={{
+                        bgcolor: 'white',
+                        height: '40px',
+                        width: '30%',
+                        border: '1px solid grey',
+                        paddingBottom: '5px',
+                        paddingTop: "-1px",
+                        borderRadius: "10px",
+                        "& .MuiOutlinedInput-root": {
+                            "& fieldset": {
+                                textAlign: 'center',
+                                border: "none",
+                                borderColor: 'grey',
+                                display: 'flex',
+                                textAlign: 'center',
+                            },
+                            "&:hover fieldset": {
+                                borderColor: "grey",
+                            },
+                            "&.Mui-focused fieldset": {
+                                borderColor: "#157AFE",
+                            },
+                        },
+                    }}
+                    placeholder="Search..."
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon sx={{ mr: "auto", mt: -0.5 }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                />
 
-      </Box>
+                <FormControl variant="outlined" className='input-box'>
+                    <TextField
+
+                        sx={{
+                            bgcolor: 'white',
+                            height: '40px',
+                            border: '1px solid grey',
+                            borderRadius: "10px",
+                            paddingBottom: '5px',
+
+                            "& .MuiOutlinedInput-root": {
+                                "& fieldset": {
+                                    border: "none",
+                                    borderColor: 'grey',
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: "grey",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#157AFE",
+                                },
+                            },
+                        }} variant="outlined"
+                        select
+
+                        onChange={handleStatusChange}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+
+                                    <StatusIcon color="success" sx={{ mr: "auto", mt: -0.5, mr: 1 }} />Status
+                                </InputAdornment>
+                            ),
+                        }}
+                    >
+                        <MenuItem value="In Transit">In Transit</MenuItem>
+                        <MenuItem value="Out for Delivery">Out for Delivery	</MenuItem>
+                        <MenuItem value="Placed">Placed</MenuItem>
+                        <MenuItem value="Delivered">Delivered</MenuItem>
+
+                    </TextField>
+                </FormControl>
+
+                <FormControl variant="outlined" className='input-box'>
+                    <TextField
+                        sx={{
+                            bgcolor: 'white',
+                            height: '40px',
+                            border: '1px solid grey',
+                            paddingBottom: '5px',
+                            borderRadius: "10px",
+                            "& .MuiOutlinedInput-root": {
+                                "& fieldset": {
+                                    border: "none",
+                                    borderColor: 'grey',
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: "grey",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#157AFE",
+                                },
+                            },
+                        }} variant="outlined"
+                        select
+                        onChange={handleLocationChange}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <LocationOnIcon sx={{ mr: "auto", mt: -0.5, mr: 1 }} />
+                                    Distribution
+                                </InputAdornment>
+                            ),
+                        }}
+                    >
+                        <MenuItem value="Bangalore">Bangalore</MenuItem>
+                        <MenuItem value="Patna">Patna</MenuItem>
+                        <MenuItem value="Hyderabad">Hyderabad</MenuItem>
+                    </TextField>
+                </FormControl>
 
 
-      <Showdata filteredData={filteredData}/>
-    </div>
-  );
+                <Button
+                    onClick={exportToExcel}
+
+                    className='btn'
+                    variant="contained"
+                    startIcon={<DownloadIcon />}
+                    sx={{
+                        backgroundColor: 'blue',
+                        color: 'white',
+                        borderRadius: '40px',
+                        '&:hover': {
+                            backgroundColor: '#157AFE',
+                        },
+                    }}
+                >
+                    Export orders
+                </Button>
+
+            </Box>
+
+
+            <Showdata filteredData={filteredData} />
+        </div>
+    );
 }
